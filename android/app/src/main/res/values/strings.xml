@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Vyapari</string>
+    <string name="title_activity_main">Vyapari</string>
+    <string name="package_name">com.vyapari.app</string>
+    <string name="custom_url_scheme">com.vyapari.app</string>
+</resources>
