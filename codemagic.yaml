@@ -1,16 +1,18 @@
-workflows:
-  android-apk:
+ workflows:
+  android-release:
     name: Vyapari Android APK
     max_build_duration: 60
     environment:
       node: 18
+      java: 17
+      android_signing:
+        - vyapari_keystore
     scripts:
       - name: Install dependencies
         script: |
-         chmod +x android/gradlew
           npm install
 
-      - name: Build web app
+      - name: Build web
         script: |
           npm run build
 
@@ -18,10 +20,19 @@ workflows:
         script: |
           npx cap sync android
 
-      - name: Build Android APK
+      - name: Build SIGNED release APK
         script: |
           cd android
+          chmod +x gradlew
           ./gradlew assembleRelease
 
     artifacts:
-      - android/app/build/outputs/**/*.apk
+      - android/app/build/outputs/apk/release/app-release.apk
+     
+        
+        
+
+  
+
+    
+    
