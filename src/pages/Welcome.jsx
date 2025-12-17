@@ -14,6 +14,10 @@ export default function Welcome() {
   const [businessName, setBusinessName] = useState("");
   const [ownerName, setOwnerName] = useState("");
 
+  const SUPABASE_FUNCTION_URL =
+  "https://ocqovijbeyneydbjvzdz.supabase.co/functions/v1";
+
+
   /* ---------------- SLIDE STYLE ---------------- */
   const panelStyle = (active, from) => ({
     transform:
@@ -28,50 +32,78 @@ export default function Welcome() {
 
   /* ---------------- OTP SEND ---------------- */
   const sendOtp = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("/functions/v1/send-otp", {
+  try {
+    setLoading(true);
+
+    const res = await fetch(
+      `${SUPABASE_FUNCTION_URL}/send-otp`,
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: `+91${phone}` }),
-      });
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          phone: `+91${phone}`,
+        }),
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+    const data = await res.json();
 
-      setStep("otp");
-    } catch (e) {
-      alert(e.message || "Failed to send OTP");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(data.error || "Failed to send OTP");
     }
-  };
+
+    setStep("otp");
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   /* ---------------- OTP VERIFY ---------------- */
   const verifyOtp = async () => {
-    try {
-      setLoading(true);
-      const res = await fetch("/functions/v1/verify-otp", {
+  try {
+    setLoading(true);
+
+    const res = await fetch(
+      `${SUPABASE_FUNCTION_URL}/verify-otp`,
+      {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone: `+91${phone}`, otp }),
-      });
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify({
+          phone: `+91${phone}`,
+          otp,
+        }),
+      }
+    );
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error);
+    const data = await res.json();
 
-      localStorage.setItem(
-        "auth_user",
-        JSON.stringify({ isVerified: true, phone })
-      );
-
-      setStep("business");
-    } catch (e) {
-      alert(e.message || "Invalid OTP");
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error(data.error || "Invalid OTP");
     }
-  };
+
+    localStorage.setItem(
+      "auth_user",
+      JSON.stringify({ isVerified: true, phone })
+    );
+
+    setStep("business");
+  } catch (e) {
+    alert(e.message);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   /* ---------------- SAVE BUSINESS ---------------- */
   const saveBusiness = async () => {
